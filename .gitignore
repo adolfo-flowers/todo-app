@@ -1,0 +1,11 @@
+.shadow-cljs/
+node_modules/
+.nrepl-port
+
+resources/public/js
+resources/main.js
+target/
+.clj-kondo/
+.lsp/
+out/
+resources/public/.tern-port
