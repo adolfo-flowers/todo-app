@@ -7,11 +7,13 @@
   (ant/form
    {:name "basic"
     :label-col {:span 8}
-    :wrapper-col {:span 16}
+    :wrapper-col {:span 10}
     :initial-values {:remember true}
     :on-finish (fn [v] (let [values (js->clj v {:keywordize-keys true})]
-                         (println state)
-                         (d/transact! state [{:todo/content (:content values) :todo/title (:title values) :todo/due-date (:due-date values)}])))
+                         (d/transact! state [{:todo/content (:content values)
+                                              :todo/title (:title values)
+                                              :todo/due-date (.toISOString (:due-date values))
+                                              :todo/status "todo"}])))
     :on-finish-failed println}
    (ant/form-item
     {:label "Title" :name "title" :rules (clj->js [{:required true :message "Please enter a title"}])}
@@ -27,12 +29,13 @@
     (ant/input-text-area {:rows 4}))
    (ant/form-item
     {:wrapper-col {:offset 8 :span 16}}
-    (ant/button {:type "primary" :html-type "submit"} "Submit"))))
+    (ant/button {:type "primary" :html-type "submit"} "Create"))))
 
 (rum/defcs create-todo-button < (rum/local false ::modal-form)
   [local-state state]
   (let [modal-form (::modal-form local-state)]
     [(ant/modal {:key 1
+                 :footer nil
                  :open @modal-form
                  :title "New Todo"
                  :width 600

@@ -10,12 +10,12 @@
     [:div
      {:style {:flex "1 30%" :padding "5px"}}
      [:h1 {:style {:text-align "center"}} "To-do"]
-     (list-todos state)]
+     (list-todos state "todo")]
     [:div
      {:style {:flex "1 30%" :padding "5px"}}
      [:h1 {:style {:text-align "center"}} "In progress"]
-     (list-todos state)]
+     (list-todos state "in-progress")]
     [:div
      {:style {:flex "1 30%" :padding "5px"}}
      [:h1 {:style {:text-align "center"}} "Done"]
-     (list-todos state)]]))
+     (list-todos state "done")]]))

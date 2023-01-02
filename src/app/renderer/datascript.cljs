@@ -3,7 +3,7 @@
 
 (def schema {:todo/tags     {:db/cardinality :db.cardinality/many}
              :todo/project  {:db/valueType :db.type/ref}
-             :todo/done     {:db/index true}
+             :todo/status   {:db/cardinality :db.cardinality/one}
              :todo/due-date {:db/index true}
              :todo/title    {:db/cardinality :db.cardinality/one}
              :todo/content    {:db/cardinality :db.cardinality/one}

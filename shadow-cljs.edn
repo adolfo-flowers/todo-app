@@ -7,7 +7,7 @@
 
  :dev-http {8080 "resources/public/"}
 
- :compiler-options {:optimizations :advanced :externs ["datascript/externs.js"]}
+ :compiler-options {:optimizations :advanced :infer-externs :auto :externs ["datascript/externs.js"]}
 
  :builds {:main {:target :node-script
                  :output-to "resources/main.js"
