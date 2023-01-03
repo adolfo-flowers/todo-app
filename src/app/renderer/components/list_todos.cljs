@@ -1,7 +1,8 @@
 (ns app.renderer.components.list-todos
   (:require   [rum.core :as rum]
               [datascript.core :as d]
-              [antizer.rum :as ant]))
+              [antizer.rum :as ant]
+              ["moment" :as moment]))
 
 (def state-transitions {"todo" "in-progress" "in-progress" "done" "done" "todo"})
 
@@ -30,7 +31,7 @@
              {:key (:id todo)
               :header [:div
                        [:h3 (:title todo)
-                        [:span {:style {:margin "0 0 0 5px"}} (:due-date todo)]
+                        [:span {:style {:margin "0 0 0 5px"}} (.fromNow (moment (:due-date todo)))]
                         (transition-button status conn (:id todo))]]}
              [:p
               {:key (:id todo)}
