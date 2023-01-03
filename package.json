@@ -1,7 +1,7 @@
 {
   "name": "viva-todo-app",
   "version": "1.0.0",
-  "description": "shadow-cljs electron starter",
+  "description": "Viva to-do app",
   "main": "resources/main.js",
   "scripts": {
     "dev": "shadow-cljs watch main renderer",
@@ -13,7 +13,7 @@
     "reagent",
     "electron"
   ],
-  "author": "Ahonn Jiang <ahonn95@outlook.com>",
+  "author": "Adolfo",
   "license": "MIT",
   "config": {
     "forge": {

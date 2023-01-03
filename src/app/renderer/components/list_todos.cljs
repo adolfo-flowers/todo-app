@@ -1,39 +1,34 @@
 (ns app.renderer.components.list-todos
   (:require   [rum.core :as rum]
-              [datascript.core :as d]
+              [app.renderer.datascript :refer [get-todos-by-status update-todo-status]]
               [antizer.rum :as ant]
               ["moment" :as moment]))
 
 (def state-transitions {"todo" "in-progress" "in-progress" "done" "done" "todo"})
 
-(defn transition-button [status conn id]
+(defn transition-button [conn id new-todo-status]
   (ant/button
    {:style {:margin-left "10px"}
-    :on-click (fn []
-                (d/transact! conn [{:db/id id :todo/status (state-transitions status)}]))}
-   (state-transitions status)))
+    :on-click (fn [] (update-todo-status conn id new-todo-status))}
+   new-todo-status))
+
+(defn todo-block-header [conn todo]
+  [:div
+   [:h3 (:title todo)
+    [:span {:style {:margin "0 0 0 5px"}} (.fromNow (moment (:due-date todo)))]
+    (transition-button conn (:id todo) (state-transitions (:status todo)))]])
+
+(defn todo-block [conn todo]
+  (ant/collapse-panel
+   {:key (:id todo)
+    :header (todo-block-header conn todo)}
+   [:p
+    {:key (:id todo)}
+    (:content todo)]))
 
 (rum/defc list-todos < rum/reactive
-  [conn status]
+  [conn todo-status]
   (let [db (rum/react conn)
-        todos (d/q '[:find ?id ?title ?content ?due-date
-                     :in $ ?status
-                     :keys id title content due-date
-                     :where
-                     [?id :todo/title ?title]
-                     [?id :todo/status ?status]
-                     [?id :todo/due-date ?due-date]
-                     [?id :todo/content ?content]]
-                   db status)]
+        todos (get-todos-by-status db todo-status)]
     (ant/collapse
-     (map (fn [todo]
-            (ant/collapse-panel
-             {:key (:id todo)
-              :header [:div
-                       [:h3 (:title todo)
-                        [:span {:style {:margin "0 0 0 5px"}} (.fromNow (moment (:due-date todo)))]
-                        (transition-button status conn (:id todo))]]}
-             [:p
-              {:key (:id todo)}
-              (:content todo)]))
-          todos))))
+     (map (partial todo-block conn) todos))))
