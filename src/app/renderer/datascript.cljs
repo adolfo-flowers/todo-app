@@ -7,29 +7,28 @@
              :todo/status   {:db/cardinality :db.cardinality/one}
              :todo/due-date {:db/index true}
              :todo/title    {:db/cardinality :db.cardinality/one}
-             :todo/content    {:db/cardinality :db.cardinality/one}
+             :todo/notes    {:db/cardinality :db.cardinality/one}
              :route/handler {:db/cardinality :db.cardinality/one}
              :route/params  {:db/cardinality :db.cardinality/one}})
 
 (defonce _state (d/create-conn schema))
 
 (defn create-todo [conn todo]
-  (d/transact! conn [{:todo/content (:content todo)
+  (d/transact! conn [{:todo/notes (:notes todo)
                       :todo/title (:title todo)
                       :todo/due-date (.toISOString (:due-date todo))
                       :todo/status "todo"
                       :todo/project (:project todo)}]))
 
 (defn get-todos-by-status [db status]
-  (d/q '[:find ?id ?title ?content ?due-date ?status
+  (d/q '[:find ?id ?title ?notes ?due-date ?status
          :in $ ?status
-         :keys id title content due-date status
+         :keys id title notes due-date status
          :where
          [?id :todo/title ?title]
          [?id :todo/status ?status]
-         ;;[?id :todo/status ?st]
          [?id :todo/due-date ?due-date]
-         [?id :todo/content ?content]]
+         [?id :todo/notes ?notes]]
        db status))
 
 (defn update-todo-status [conn id status]

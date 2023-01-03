@@ -15,9 +15,9 @@
 (defonce root (createRoot (gdom/getElement "app-container")))
 
 (defn main-component
-  [state]
+  [conn]
   (ant/layout
-   (ant/affix (ant/layout (header state)))
+   (ant/affix (ant/layout (header conn)))
    (ant/layout {:has-sider true}
                (ant/layout-sider
                 {:style {:overflow "auto"
@@ -26,9 +26,9 @@
                          :left 0
                          :top 63
                          :bottom 0}}
-                (side-menu))
+                (side-menu conn))
                (ant/layout {:style {:marginLeft 200}}
-                           (content-area state)))))
+                           (content-area conn)))))
 
 (defn  ^:dev/after-load start! []
   (.render root (main-component _state)))

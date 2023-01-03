@@ -24,7 +24,7 @@
       (ant/button {:type "text" :on-click  (fn [e]
                                              (e.preventDefault)
                                              (create-project conn @new-project)
-                                             (reset! new-project ""))} "+")]]))
+                                             (reset! new-project ""))} "create project")]]))
 
 (rum/defcs create-todo-form < rum/reactive
   [local-state conn]
@@ -61,7 +61,7 @@
                           :message "Please enter a due date"}])}
       (ant/date-picker {:show-time {:defaultValue (moment "00:00:00" "HH:mm")}}))
      (ant/form-item
-      {:label "content" :name "content" :rules (clj->js [{:required false}])}
+      {:label "Notes" :name "notes" :rules (clj->js [{:required false}])}
       (ant/input-text-area {:rows 4}))
      (ant/form-item
       {:wrapper-col {:offset 8 :span 16}}
