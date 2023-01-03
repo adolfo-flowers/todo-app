@@ -1,0 +1,2 @@
+{:lint-as {antizer.macros/define-fn clojure.core/defn}
+ :linters {:unresolved-var {:exclude [antizer.rum]}}}

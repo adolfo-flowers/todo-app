@@ -2,10 +2,12 @@
 node_modules/
 .nrepl-port
 
+.cpcache/
 resources/public/js
 resources/main.js
 target/
-.clj-kondo/
+.clj-kondo/.cache/
+.clj-kondo/clj-kondo/
 .lsp/
 out/
 resources/public/.tern-port
