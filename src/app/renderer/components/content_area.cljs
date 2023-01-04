@@ -1,6 +1,8 @@
 (ns app.renderer.components.content-area
   (:require [antizer.rum :as ant]
             [rum.core :as rum]
+            [app.renderer.components.todo-table :refer [todo-table]]
+            [app.renderer.components.calendar :refer [calendar]]
             [app.renderer.datascript :refer [get-selected-content]]
             [app.renderer.components.list-todos :refer [list-todos]]))
 
@@ -22,13 +24,15 @@
 
 (def content-by-key {"all" todos-by-status
                      "projects" todos-by-status
-                     "calendar" todos-by-status})
+                     "calendar" calendar
+                     "manage" todo-table})
 
 (rum/defc content-area < rum/reactive
   [conn]
   (let [db (rum/react conn)
-        [ck project-id] (get-selected-content db)]
+        [ck project-id] (get-selected-content db)
+        _ (println "selecting content" ck)]
     (ant/layout-content
      {:style {:margin "0px 16px 0"
               :overflow "initial"}}
-     ((content-by-key (or ck "all")) conn (js/Number project-id)))))
+     ((content-by-key ck todos-by-status) conn (js/Number project-id)))))

@@ -27,7 +27,7 @@
                              "Calendar")
               (ant/menu-sub-menu {:title "Projects" :key "projects" :disabled (empty? projects)}
                                  (list-projects conn projects))
-              (ant/menu-item {:key "manage-todos"}
+              (ant/menu-item {:on-click (partial select-content-display conn)  :key "manage-todos"}
                              "Manage Todos")
-              (ant/menu-item {:key "stats"}
+              (ant/menu-item {:on-click (partial select-content-display conn)  :key "stats"}
                              "Stats"))))

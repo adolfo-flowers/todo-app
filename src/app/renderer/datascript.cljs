@@ -33,11 +33,13 @@
                                [?id :todo/due-date ?due-date]
                                [?id :todo/notes ?notes]]})
 
-(def query-all-todos '{:find [?id ?title ?notes ?due-date ?status]
-                       :in [$ ?status ?project-id]
-                       :keys [id title notes due-date status]
+(def query-all-todos '{:find [?id ?title ?notes ?due-date ?status ?project-name]
+                       :in [$ ?status _]
+                       :keys [id title notes due-date status project]
                        :where
-                       [[?id :todo/title ?title]
+                       [[?id :todo/project ?project-id]
+                        [?project-id :project/name ?project-name]
+                        [?id :todo/title ?title]
                         [?id :todo/status ?status]
                         [?id :todo/due-date ?due-date]
                         [?id :todo/notes ?notes]]})
@@ -45,6 +47,17 @@
 (defn get-todos-by-status [db status project-id]
   (let [query (if (pos? project-id) query-todos-by-project query-all-todos)]
     (d/q query db status project-id)))
+
+(defn get-todos [db]
+  (d/q '{:find [?id ?title ?notes ?due-date ?status ?project-name]
+         :keys [id title notes due-date status project]
+         :where
+         [[?id :todo/project ?project-id]
+          [?project-id :project/name ?project-name]
+          [?id :todo/title ?title]
+          [?id :todo/status ?status]
+          [?id :todo/due-date ?due-date]
+          [?id :todo/notes ?notes]]} db))
 
 (defn update-todo-status [conn id status]
   (d/transact! conn [{:db/id id :todo/status status}]))
@@ -58,6 +71,9 @@
          :where
          [?id :project/name ?name]]
        db))
+
+(defn get-todos-by-date [db date]
+  [])
 
 (defn select-content [conn content]
   (d/transact! conn [{:db/id 1 :display/content content}]))
@@ -79,5 +95,4 @@
 (when-let [stored (js/localStorage.getItem local-storage-db-key)]
   (let [stored-db (dt/read-transit-str stored)]
     (when (= (:schema stored-db) schema) ;; check for code update
-      (reset! _state stored-db)
-      true)))
+      (reset! _state stored-db))))
