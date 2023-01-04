@@ -17,6 +17,7 @@
 (defn main-component
   [conn]
   (ant/layout
+   {:style {:height "100%"}}
    (ant/affix (ant/layout (header conn)))
    (ant/layout {:has-sider true}
                (ant/layout-sider
