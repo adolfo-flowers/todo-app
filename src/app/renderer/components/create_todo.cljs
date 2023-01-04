@@ -23,8 +23,8 @@
                   :on-change (fn [^js/event.target.value e] (reset! new-project (.-target.value e)))})
       (ant/button {:type "text" :on-click  (fn [e]
                                              (e.preventDefault)
-                                             (create-project conn @new-project)
-                                             (reset! new-project ""))} "create project")]]))
+                                             (when (not-empty @new-project) (create-project conn @new-project)
+                                                   (reset! new-project "")))} "create project")]]))
 
 (rum/defcs create-todo-form < rum/reactive
   [local-state conn]

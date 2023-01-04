@@ -33,6 +33,6 @@
         [ck project-id] (get-selected-content db)
         _ (println "selecting content" ck)]
     (ant/layout-content
-     {:style {:margin "0px 16px 0"
+     {:style {:margin "70px 16px 0"
               :overflow "initial"}}
      ((content-by-key ck todos-by-status) conn (js/Number project-id)))))

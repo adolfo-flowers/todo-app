@@ -1,6 +1,7 @@
 (ns app.renderer.datascript
   (:require [datascript.core :as d]
             [clojure.string :refer [split]]
+            [mount.core :as m]
             [datascript.transit :as dt]))
 
 (def schema {:project/name       {:db/cardinality :db.cardinality/one}
@@ -13,8 +14,6 @@
              :todo/title         {:db/cardinality :db.cardinality/one}
              :todo/notes         {:db/cardinality :db.cardinality/one}
              :display/content    {:db/cardinality :db.cardinality/one}})
-
-(defonce _state (d/create-conn schema))
 
 (defn create-todo [conn todo]
   (d/transact! conn [{:todo/notes (or (:notes todo) "")
@@ -72,8 +71,23 @@
          [?id :project/name ?name]]
        db))
 
+(defn check-date [^js/moment.isSame calendar-date todo-date]
+  (let [check (fn [t] (.isSame calendar-date todo-date t))]
+    (and (check "year") (check "month") (check "day"))))
+
 (defn get-todos-by-date [db date]
-  [])
+  (let [todos (d/q '{:find [?id ?title ?notes ?due-date ?status ?project-name]
+                     :in [$ ?date ?check-date]
+                     :keys [id title notes due-date status project]
+                     :where
+                     [[?id :todo/project ?project-id]
+                      [?project-id :project/name ?project-name]
+                      [?id :todo/title ?title]
+                      [?id :todo/status ?status]
+                      [?id :todo/due-date ?due-date]
+                      [(?check-date ?date ?due-date)]
+                      [?id :todo/notes ?notes]]} db date check-date)]
+    todos))
 
 (defn select-content [conn content]
   (d/transact! conn [{:db/id 1 :display/content content}]))
@@ -86,13 +100,23 @@
 (defn persist [db]
   (js/localStorage.setItem local-storage-db-key (dt/write-transit-str db)))
 
-(d/listen! _state :persistence
-           (fn [tx-report] ;; FIXME do not notify with nil as db-report
-                  ;; FIXME do not notify if tx-data is empty
-             (when-let [db (:db-after tx-report)]
-               (persist db))))
+(defn load-db-from-ls [conn]
+  (when-let [stored (js/localStorage.getItem local-storage-db-key)]
+    (let [stored-db (dt/read-transit-str stored)]
+      (when (= (:schema stored-db) schema) ;; check for code update
+        (reset! conn stored-db)))))
 
-(when-let [stored (js/localStorage.getItem local-storage-db-key)]
-  (let [stored-db (dt/read-transit-str stored)]
-    (when (= (:schema stored-db) schema) ;; check for code update
-      (reset! _state stored-db))))
+(defn save-on-every-transaction [conn]
+  (d/listen! conn :persistence
+             (fn [tx-report] ;; FIXME do not notify with nil as db-report
+                  ;; FIXME do not notify if tx-data is empty
+               (when-let [db (:db-after tx-report)]
+                 (persist db)))))
+
+(defn init-db []
+  (let [conn (d/create-conn schema)]
+    (load-db-from-ls conn)
+    (save-on-every-transaction conn)
+    conn))
+
+(m/defstate conn :start (init-db))
