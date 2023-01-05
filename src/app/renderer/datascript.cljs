@@ -25,32 +25,6 @@
                       :todo/status (or (:status todo) "todo")
                       :todo/project [:project/name (:project todo)]}]))
 
-(def query-todos-by-project '{:find [?id ?title ?notes ?due-date ?status ?project-name]
-                              :in [$ ?status ?project-id]
-                              :keys [id title notes due-date status project]
-                              :where
-                              [[?id :todo/project ?project-id]
-                               [?project-id :project/name ?project-name]
-                               [?id :todo/title ?title]
-                               [?id :todo/status ?status]
-                               [?id :todo/due-date ?due-date]
-                               [?id :todo/notes ?notes]]})
-
-(def query-all-todos '{:find [?id ?title ?notes ?due-date ?status ?project-name]
-                       :in [$ ?status _]
-                       :keys [id title notes due-date status project]
-                       :where
-                       [[?id :todo/project ?project-id]
-                        [?project-id :project/name ?project-name]
-                        [?id :todo/title ?title]
-                        [?id :todo/status ?status]
-                        [?id :todo/due-date ?due-date]
-                        [?id :todo/notes ?notes]]})
-
-(defn get-todos-by-status [db status project-id]
-  (let [query (if (pos? project-id) query-todos-by-project query-all-todos)]
-    (d/q query db status project-id)))
-
 (defn get-todos [db]
   (d/q '{:find [?id ?title ?notes ?due-date ?status ?project-name]
          :keys [id title notes due-date status project]
@@ -60,7 +34,21 @@
           [?id :todo/title ?title]
           [?id :todo/status ?status]
           [?id :todo/due-date ?due-date]
-          [?id :todo/notes ?notes]]} db))
+          [?id :todo/notes ?notes]]}
+       db))
+
+(defn get-todos-by-project-id [db project-id]
+  (d/q '{:find [?id ?title ?notes ?due-date ?status ?project-name]
+         :in [$ ?project-id]
+         :keys [id title notes due-date status project]
+         :where
+         [[?id :todo/project ?project-id]
+          [?project-id :project/name ?project-name]
+          [?id :todo/title ?title]
+          [?id :todo/status ?status]
+          [?id :todo/due-date ?due-date]
+          [?id :todo/notes ?notes]]}
+       db project-id))
 
 (defn update-todo-status [conn id status]
   (d/transact! conn [{:db/id id :todo/status status}]))
@@ -109,7 +97,7 @@
   (let [todos (d/q '{:find [?id ?title ?notes ?due-date ?status ?project-name]
                      :keys [id title notes due-date status project]
                      :where
-                     [[1 :modal/todo ?id]
+                     [[_ :modal/todo ?id]
                       [?id :todo/project ?project-id]
                       [?project-id :project/name ?project-name]
                       [?id :todo/title ?title]

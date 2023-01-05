@@ -25,4 +25,4 @@
 (defn main []
   (.on app "window-all-closed" #(when-not (= js/process.platform "darwin")
                                   (.quit app)))
-  (.then (.then (.whenReady app)  init-browser) show-notification))
+  (.then (.whenReady app)  init-browser))
