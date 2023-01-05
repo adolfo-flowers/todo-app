@@ -16,7 +16,7 @@
 
 (defonce root (createRoot (gdom/getElement "app-container")))
 
-(rum/defc main-component < rum/static
+(rum/defc main-component
   [conn]
   (ant/layout
    {:key 1 :style {:min-height "100%"}}

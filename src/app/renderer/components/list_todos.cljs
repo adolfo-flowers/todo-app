@@ -26,10 +26,12 @@
                  :overflow "hidden"
                  :text-overflow "ellipsis"}}
     (:title todo)]
-   (ant/tag {:color "warning"
+   (ant/tag {:color (if (not= "done" (:status todo))  "warning" "success")
              :icon (js/React.createElement ClockCircleOutlined)
              :style {:flex "0 1 10%"}}
-            (.fromNow (moment (:due-date todo))))])
+            (if (not= "done" (:status todo))
+              (.fromNow (moment (:due-date todo)))
+              "done"))])
 
 (defn format-date [ts]
   (.format (moment ts) "llll"))
