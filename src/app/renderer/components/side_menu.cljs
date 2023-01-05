@@ -2,6 +2,7 @@
   (:require
    [app.renderer.datascript :refer [get-projects select-content]]
    [rum.core :as rum]
+   ["@ant-design/icons" :refer [CalendarOutlined ProjectOutlined HomeOutlined EditOutlined]]
    [antizer.rum :as ant]))
 
 (defn select-content-display [conn e]
@@ -20,11 +21,20 @@
   (let [db (rum/react conn)
         projects (get-projects db)]
     (ant/menu {:mode "inline" :theme :dark}
-              (ant/menu-item {:on-click (partial select-content-display conn) :key "all"}
+              (ant/menu-item {:icon (js/React.createElement HomeOutlined)
+                              :on-click (partial select-content-display conn)
+                              :key "all"}
                              "All")
-              (ant/menu-item {:on-click (partial select-content-display conn)  :key "calendar"}
+              (ant/menu-item {:icon (js/React.createElement CalendarOutlined)
+                              :on-click (partial select-content-display conn)
+                              :key "calendar"}
                              "Calendar")
-              (ant/menu-sub-menu {:title "Projects" :key "projects" :disabled (empty? projects)}
+              (ant/menu-sub-menu {:icon (js/React.createElement ProjectOutlined)
+                                  :title "Projects"
+                                  :key "projects"
+                                  :disabled (empty? projects)}
                                  (list-projects conn projects))
-              (ant/menu-item {:on-click (partial select-content-display conn)  :key "manage-todos"}
+              (ant/menu-item {:icon (js/React.createElement EditOutlined)
+                              :on-click (partial select-content-display conn)
+                              :key "manage-todos"}
                              "Manage Todos"))))

@@ -3,7 +3,12 @@
             [rum.core :as rum]
             ["moment" :as moment]
             ["antd" :refer [Form]]
-            [app.renderer.datascript :refer [get-projects create-project create-todo get-modal-state set-modal-state]]))
+            ["@ant-design/icons"  :refer [PlusOutlined]]
+            [app.renderer.datascript :refer [get-projects
+                                             create-project
+                                             create-todo
+                                             get-modal-state
+                                             set-modal-state]]))
 
 (defn create-todo-from-values [conn todo]
   (create-todo conn todo))
@@ -53,7 +58,7 @@
        :name "project"
        :rules (clj->js [{:required true :message "Please enter a title"}])}
       (ant/select {:style {:width "300px"}
-                   :show-search true
+                   :show-search false
                    :placeholder "Select a project"
                    :dropdown-render (partial drop-down-select-project conn)
                    :options (map #(clj->js {:label (:name %) :value (:name %)}) projects)}))
@@ -92,4 +97,4 @@
         open (get-modal-state db 1)
         set-open (partial set-modal-state conn 1)]
     [(create-todo-modal conn open set-open nil)
-     (ant/button {:key 2 :on-click #(set-open true)} "+")]))
+     (ant/button {:type "primary" :icon (js/React.createElement PlusOutlined) :key 2 :on-click #(set-open true)})]))
