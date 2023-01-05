@@ -22,7 +22,7 @@
                       :todo/notes (or (:notes todo) "")
                       :todo/title (:title todo)
                       :todo/due-date (.toISOString (:due-date todo))
-                      :todo/status "todo"
+                      :todo/status (or (:status todo) "todo")
                       :todo/project [:project/name (:project todo)]}]))
 
 (def query-todos-by-project '{:find [?id ?title ?notes ?due-date ?status ?project-name]
