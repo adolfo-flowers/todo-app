@@ -1,4 +1,4 @@
-# shadow-electron-starter
+# Todo App
 ClojureScript + Shadow-cljs + Electron + Rum
 
 ## How to Run
@@ -12,5 +12,12 @@ npx electron .
 ## Release
 ```
 npm run build
-npx electron-packager . HelloWorld --platform=darwin --arch=x64
 ```
+
+## Todo
+* Tests
+* Delete for todos and Projects
+* Day view When clicking calendar
+* Notifications and running process in the background
+* Save todos to the "cloud"
+* Change default electron App icon

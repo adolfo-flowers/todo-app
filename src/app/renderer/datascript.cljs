@@ -75,13 +75,13 @@
          [?id :project/name ?name]]
        db))
 
-(defn check-date [^js/moment.isSame calendar-date todo-date]
+(defn same-dateTime? [^js/moment.isSame calendar-date todo-date]
   (let [check (fn [t] (.isSame calendar-date todo-date t))]
     (and (check "year") (check "month") (check "day"))))
 
 (defn get-todos-by-date [db date]
   (let [todos (d/q '{:find [?id ?title ?notes ?due-date ?status ?project-name]
-                     :in [$ ?date ?check-date]
+                     :in [$ ?date ?same-dateTime?]
                      :keys [id title notes due-date status project]
                      :where
                      [[?id :todo/project ?project-id]
@@ -89,8 +89,8 @@
                       [?id :todo/title ?title]
                       [?id :todo/status ?status]
                       [?id :todo/due-date ?due-date]
-                      [(?check-date ?date ?due-date)]
-                      [?id :todo/notes ?notes]]} db date check-date)]
+                      [(?same-dateTime? ?date ?due-date)]
+                      [?id :todo/notes ?notes]]} db date same-dateTime?)]
     todos))
 
 (defn select-content [conn content]
@@ -134,8 +134,7 @@
 
 (defn save-on-every-transaction [conn]
   (d/listen! conn :persistence
-             (fn [tx-report] ;; FIXME do not notify with nil as db-report
-                  ;; FIXME do not notify if tx-data is empty
+             (fn [tx-report]
                (when-let [db (:db-after tx-report)]
                  (persist db)))))
 

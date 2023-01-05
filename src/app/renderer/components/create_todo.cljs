@@ -1,7 +1,6 @@
 (ns app.renderer.components.create-todo
   (:require [antizer.rum :as ant]
             [rum.core :as rum]
-            [clojure.data :refer [diff]]
             ["moment" :as moment]
             ["antd" :refer [Form]]
             ["@ant-design/icons"  :refer [PlusOutlined]]
@@ -50,7 +49,7 @@
    {:label "Project"
     :name "project"
     :rules (clj->js [{:required true :message "Please enter a title"}])}
-   (ant/select {:style {:width "300px"}
+   (ant/select {:style {:max-width "300px"}
                 :show-search false
                 :placeholder "Select a project"
                 :dropdown-render (partial drop-down-select-project conn)
@@ -66,10 +65,12 @@
 (defn status-input []
   (ant/form-item
    {:label "Status"
-    :name "status"
-    ;;:rules (clj->js [{:required true :message "Please enter a title"}])
-    }
-   (ant/input)))
+    :name "status"}
+   (ant/select {:style {:max-width "300px"}
+                :show-search false
+                :placeholder "Select status"
+                :options (map #(clj->js {:label % :value %})
+                              ["todo" "in-progress" "done"])})))
 
 (defn notes-input []
   (ant/form-item
@@ -77,8 +78,10 @@
    (ant/input-text-area {:rows 4})))
 
 (defn submit-button [text]
-  (ant/form-item {:wrapper-col {:offset 8 :span 16}}
-                 (ant/button {:type "primary" :html-type "submit"}
+  (ant/form-item {:wrapper-col {:offset 8 :span 10}}
+                 (ant/button {:block true
+                              :type "primary"
+                              :html-type "submit"}
                              text)))
 
 (rum/defcs todo-form < rum/reactive

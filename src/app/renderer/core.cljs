@@ -19,19 +19,20 @@
   [conn]
   (ant/layout
    {:style {:min-height "100%"}}
-   [:div.sticky {:id "hdr"}
-    (header conn)]
-   (ant/layout {:has-sider true}
-               (ant/layout-sider
-                {:style {:overflow "auto"
-                         :height "100vh"
-                         :position "fixed"
-                         :left 0
-                         :top 63
-                         :bottom 0}}
-                (side-menu conn))
-               (ant/layout {:style {:marginLeft 200}}
-                           (content-area conn)))))
+   [:<>
+    [:div.sticky {:id "hdr"}
+     (header conn)]
+    (ant/layout {:has-sider true}
+                (ant/layout-sider
+                 {:style {:overflow "auto"
+                          :height "100vh"
+                          :position "fixed"
+                          :left 0
+                          :top 63
+                          :bottom 0}}
+                 (side-menu conn))
+                (ant/layout {:style {:marginLeft 200}}
+                            (content-area conn)))]))
 
 (defn  ^:dev/after-load start! []
   (.render root (main-component @conn)))

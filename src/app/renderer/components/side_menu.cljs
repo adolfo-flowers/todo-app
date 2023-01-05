@@ -9,9 +9,9 @@
   (let [content (.join (.reverse (.-keyPath e)) "-")]
     (select-content conn content)))
 
-(defn list-projects [conn projects]
+(defn list-projects [on-click projects]
   (map #(ant/menu-item
-         {:on-click (partial select-content-display conn)
+         {:on-click on-click
           :key (:id %)}
          (:name %))
        projects))
@@ -33,7 +33,7 @@
                                   :title "Projects"
                                   :key "projects"
                                   :disabled (empty? projects)}
-                                 (list-projects conn projects))
+                                 (list-projects #(select-content-display conn %) projects))
               (ant/menu-item {:icon (js/React.createElement EditOutlined)
                               :on-click (partial select-content-display conn)
                               :key "manage-todos"}
