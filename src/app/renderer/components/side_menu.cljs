@@ -5,8 +5,7 @@
    [antizer.rum :as ant]))
 
 (defn select-content-display [conn e]
-  (let [content (.join (.reverse (.-keyPath e)) "-")
-        _ (println "saving display" content)]
+  (let [content (.join (.reverse (.-keyPath e)) "-")]
     (select-content conn content)))
 
 (defn list-projects [conn projects]
@@ -28,6 +27,4 @@
               (ant/menu-sub-menu {:title "Projects" :key "projects" :disabled (empty? projects)}
                                  (list-projects conn projects))
               (ant/menu-item {:on-click (partial select-content-display conn)  :key "manage-todos"}
-                             "Manage Todos")
-              (ant/menu-item {:on-click (partial select-content-display conn)  :key "stats"}
-                             "Stats"))))
+                             "Manage Todos"))))

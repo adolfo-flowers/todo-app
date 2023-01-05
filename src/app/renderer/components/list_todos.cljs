@@ -30,13 +30,18 @@
              :style {:flex "0 1 10%"}}
             (.fromNow (moment (:due-date todo))))])
 
+(defn format-date [ts]
+  (.format (moment ts) "llll"))
+
 (defn todo-block [conn todo]
   (ant/collapse-panel
    {:key (:id todo)
     :show-arrow false
     :header (todo-block-header todo)}
    (ant/card
-    {:key (:id todo) :title (.format (moment (:due-date todo)) "llll") :style {:width "300px" :overflow "hidden"}}
+    {:key (:id todo) :title (:project todo) :style {:width "300px" :overflow "hidden"}}
+    (format-date (:due-date todo))
+    (ant/divider {:style {:margin "20px 0 15px 0"}})
     (:title todo)
     (ant/divider {:style {:margin "20px 0 15px 0"}})
     (:notes todo)

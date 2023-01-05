@@ -4,7 +4,7 @@
             [mount.core :as m]
             [datascript.transit :as dt]))
 
-(def schema {:project/name       {:db/cardinality :db.cardinality/one}
+(def schema {:project/name       {:db/unique :db.unique/value :db/cardinality :db.cardinality/one}
              :todo/tags          {:db/cardinality :db.cardinality/many}
              :todo/project       {:db/valueType :db.type/ref}
              :todo/status        {:db/index true :db/cardinality :db.cardinality/one}
@@ -13,14 +13,17 @@
              :todo/finished-date {:db/index true :db/cardinality :db.cardinality/one}
              :todo/title         {:db/cardinality :db.cardinality/one}
              :todo/notes         {:db/cardinality :db.cardinality/one}
-             :display/content    {:db/cardinality :db.cardinality/one}})
+             :display/content    {:db/cardinality :db.cardinality/one}
+             :modal/open  {:db/cardinality :db.cardinality/one}
+             :modal/todo {:db/unique :db.unique/value}})
 
 (defn create-todo [conn todo]
-  (d/transact! conn [{:todo/notes (or (:notes todo) "")
+  (d/transact! conn [{:db/id (or (:id todo) -1)
+                      :todo/notes (or (:notes todo) "")
                       :todo/title (:title todo)
                       :todo/due-date (.toISOString (:due-date todo))
                       :todo/status "todo"
-                      :todo/project (:project todo)}]))
+                      :todo/project [:project/name (:project todo)]}]))
 
 (def query-todos-by-project '{:find [?id ?title ?notes ?due-date ?status]
                               :in [$ ?status ?project-id]
@@ -94,6 +97,28 @@
 
 (defn get-selected-content [db]
   (split (:display/content  (d/pull db '[:display/content] 1)) #"-"))
+
+(defn get-modal-state [db id]
+  (:modal/open  (d/pull db '[:modal/open] id)))
+
+(defn set-modal-state [conn id state]
+  (d/transact! conn [{:db/id id :modal/open state}]))
+
+(defn get-modal-todo [db]
+  (let [todos (d/q '{:find [?id ?title ?notes ?due-date ?status ?project-name]
+                     :keys [id title notes due-date status project]
+                     :where
+                     [[1 :modal/todo ?id]
+                      [?id :todo/project ?project-id]
+                      [?project-id :project/name ?project-name]
+                      [?id :todo/title ?title]
+                      [?id :todo/status ?status]
+                      [?id :todo/due-date ?due-date]
+                      [?id :todo/notes ?notes]]} db)]
+    todos))
+
+(defn set-modal-todo [conn todo]
+  (d/transact! conn [{:db/id 1 :modal/todo todo}]))
 
 (def local-storage-db-key "viva-todo-db")
 

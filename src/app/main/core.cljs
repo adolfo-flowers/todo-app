@@ -15,7 +15,6 @@
   (js/mainWindow.webContents.executeJavascript "console.log('Hey!')" true))
 
 (defn show-notification []
-  (println "hello")
   (Notification. (clj->js {:title "Basic Notification" :body "Notification from main process"})))
 
 (defn init-browser []
