@@ -106,6 +106,9 @@
                       [?id :todo/notes ?notes]]} db)]
     todos))
 
+(defn delete-todo [conn id]
+  (d/transact! conn [[:db.fn/retractEntity id]]))
+
 (defn set-modal-todo [conn todo]
   (d/transact! conn [{:db/id 1 :modal/todo todo}]))
 

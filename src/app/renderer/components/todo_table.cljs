@@ -34,11 +34,11 @@
         todos (map #(merge % {:key (:id %) :due-date (format-date (:due-date %)) :ts (:due-date %)}) (get-todos db))
         projects (get-projects db)
         pfilters (map (fn [{:keys [name]}] {:text name :value name}) projects)
-        initial-values (clj->js (update (first (get-modal-todo db)) :due-date #(moment %)))
+        selected-todo (clj->js (update (first (get-modal-todo db)) :due-date #(moment %)))
         open (get-modal-state db 3)
         set-open (partial set-modal-state conn 3)]
     [:<>
-     (create-todo-modal conn open set-open initial-values)
+     (create-todo-modal conn open set-open (js->clj selected-todo {:keywordize-keys true}))
      (ant/table {:key 5
                  :row-class-name (constantly "table-row")
                  :columns (clj->js (columns pfilters))

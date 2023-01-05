@@ -44,7 +44,7 @@
   (ant/form-item
    {:label "Project"
     :name "project"
-    :rules (clj->js [{:required true :message "Please enter a title"}])}
+    :rules (clj->js [{:required true :message "Please select a project"}])}
    (ant/select {:style {:max-width "300px"}
                 :show-search false
                 :placeholder "Select a project"
@@ -81,9 +81,9 @@
                              text)))
 
 (rum/defc todo-form
-  [projects initial-values create-todo create-project]
+  [projects todo-to-update create-todo create-project delete-todo]
   (let [[form] (Form.useForm)]
-    (rum/use-effect! #(form.setFieldsValue initial-values) [initial-values])
+    (rum/use-effect! #(form.setFieldsValue (clj->js todo-to-update)) [todo-to-update])
     (ant/form
      {:name "create-todo"
       :form form
@@ -91,31 +91,46 @@
       :wrapper-col {:span 10}
       :on-finish (fn [fv]
                    (let [form-values  (js->clj fv {:keywordize-keys true})
-                         current-todo  (js->clj initial-values {:keywordize-keys true})
-                         new-todo  (assoc form-values :id (:id current-todo -1))]
-                     (if (not= current-todo new-todo)
+                         new-todo  (assoc form-values :id (:id todo-to-update -1))]
+                     (if (not= todo-to-update new-todo)
                        (do (create-todo new-todo)
                            (form.resetFields))
-                       (form.setFieldsValue initial-values))))}
+                       (form.setFieldsValue (clj->js todo-to-update)))))}
      (title-input)
-     (when initial-values (status-input))
+     (when todo-to-update
+       (status-input))
      (project-input create-project projects)
      (due-date-input)
      (notes-input)
-     (submit-button (if (nil? initial-values) "Create" "Update")))))
+     (submit-button (if (nil? todo-to-update) "Create" "Update"))
+     (when-not (nil? todo-to-update)
+       (ant/form-item {:wrapper-col {:offset 8 :span 10}}
+                      (ant/button {:danger true
+                                   :block true
+                                   :type "primary"
+                                   :on-click delete-todo}
+                                  "delete"))))))
 
 (rum/defcs create-todo-modal < rum/reactive
-  [_ conn open? set-open initial-values]
+  [_ conn open? set-open todo-to-update]
   (let [db (rum/react conn)
         projects (d/get-projects db)]
-    (ant/modal {:key (:id initial-values)
+    (ant/modal {:key (:id todo-to-update "new-todo")
                 :footer nil
                 :open open?
-                :title (if (nil? initial-values) "New Todo" "Update todo")
+                :title (if (nil? todo-to-update)
+                         "New Todo"
+                         "Update todo")
                 :width 600
                 :on-ok #(set-open false)
                 :on-cancel #(set-open false)}
-               (todo-form projects initial-values #(d/create-todo conn %)  #(d/create-project conn %)))))
+               (todo-form projects
+                          todo-to-update
+                          #(d/create-todo conn %)
+                          #(d/create-project conn %)
+                          (fn []
+                            (d/delete-todo conn (:id todo-to-update))
+                            (d/set-modal-state conn 3 false))))))
 
 (rum/defcs create-todo-button < rum/reactive
   [_ conn]
