@@ -3,7 +3,7 @@
             [rum.core :as rum]
             ["moment" :as moment]
             ["antd" :refer [Form]]
-            ["@ant-design/icons"  :refer [PlusOutlined]]
+            ["@ant-design/icons"  :refer [PlusOutlined QuestionCircleOutlined]]
             [app.renderer.datascript :as d]))
 
 (defn create-new-project-on-click [create-project set-project-name e]
@@ -94,6 +94,7 @@
                          new-todo  (assoc form-values :id (:id todo-to-update -1))]
                      (if (not= todo-to-update new-todo)
                        (do (create-todo new-todo)
+                           (ant/message-success (str (:title new-todo) " created"))
                            (form.resetFields))
                        (form.setFieldsValue (clj->js todo-to-update)))))}
      (title-input)
@@ -105,11 +106,14 @@
      (submit-button (if (nil? todo-to-update) "Create" "Update"))
      (when-not (nil? todo-to-update)
        (ant/form-item {:wrapper-col {:offset 8 :span 10}}
-                      (ant/button {:danger true
-                                   :block true
-                                   :type "primary"
-                                   :on-click delete-todo}
-                                  "delete"))))))
+                      (ant/popconfirm {:title "Are you sure you want to delete this todo?"
+                                       :icon (js/React.createElement QuestionCircleOutlined)
+                                       :style {:color "red"}
+                                       :on-confirm delete-todo}
+                                      (ant/button {:danger true
+                                                   :block true
+                                                   :type "primary"}
+                                                  "delete")))))))
 
 (rum/defcs create-todo-modal < rum/reactive
   [_ conn open? set-open todo-to-update]
