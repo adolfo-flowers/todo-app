@@ -6,7 +6,7 @@
             [app.renderer.datascript :refer [get-selected-content get-todos-by-status]]
             [app.renderer.components.list-todos :refer [list-todos]]))
 
-(rum/defc todos-by-status < rum/reactive
+(rum/defc todos-by-status < rum/static  rum/reactive
   [conn project-id]
   (let [db (rum/react conn)
         todo-todos (get-todos-by-status db "todo"  project-id)
@@ -31,7 +31,7 @@
                      "calendar" calendar
                      "manage" todo-table})
 
-(rum/defc content-area < rum/reactive
+(rum/defc content-area < rum/static  rum/reactive
   [conn]
   (let [db (rum/react conn)
         [ck project-id] (get-selected-content db)]

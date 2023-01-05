@@ -2,6 +2,7 @@
   (:require
    [app.renderer.datascript :refer [update-todo-status]]
    [antizer.rum :as ant]
+   [rum.core :as rum]
    ["@ant-design/icons" :refer [ClockCircleOutlined]]
    ["moment" :as moment]))
 
@@ -50,7 +51,7 @@
     (ant/divider {:style {:margin "20px 0 15px 0"}})
     (button))))
 
-(defn list-todos
+(rum/defc list-todos < rum/static
   [conn todos]
   (ant/collapse
    (map (fn [todo]

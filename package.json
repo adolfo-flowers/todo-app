@@ -5,8 +5,9 @@
   "main": "resources/main.js",
   "scripts": {
     "dev": "shadow-cljs watch main renderer",
-    "build": "shadow-cljs compile main renderer && npx electron-packager . VivaTodo --platform=darwin,win32 --arch=x64,arm64,universal",
-    "clean": "rm -rf resources/public/js/* && rm -rf target"
+    "build": "npm run clean && shadow-cljs compile main renderer",
+    "clean": "rm -rf resources/public/js/* && rm -rf target",
+    "release": "npx electron-packager . VivaTodo --platform=darwin,linux,win32 --arch=x64,universal" 
   },
   "keywords": [
     "shadow-cljs",

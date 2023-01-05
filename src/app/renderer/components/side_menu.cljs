@@ -16,7 +16,7 @@
          (:name %))
        projects))
 
-(rum/defc side-menu < rum/reactive
+(rum/defc side-menu < rum/static  rum/reactive
   [conn]
   (let [db (rum/react conn)
         projects (get-projects db)]

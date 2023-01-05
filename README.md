@@ -12,6 +12,7 @@ npx electron .
 ## Release
 ```
 npm run build
+npm run release
 ```
 
 ## Todo

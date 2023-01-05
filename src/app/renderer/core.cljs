@@ -2,6 +2,7 @@
   (:require
    [goog.dom :as gdom]
    [antizer.rum :as ant]
+   [rum.core :as rum]
    [mount.core :as m]
    [app.renderer.components.side-menu :refer [side-menu]]
    [app.renderer.components.header :refer [header]]
@@ -15,23 +16,24 @@
 
 (defonce root (createRoot (gdom/getElement "app-container")))
 
-(defn main-component
+(rum/defc main-component < rum/static
   [conn]
   (ant/layout
-   {:style {:min-height "100%"}}
-   [:<>
-    [:div.sticky {:id "hdr"}
+   {:key 1 :style {:min-height "100%"}}
+   [:<> {:key 1}
+    [:div.sticky {:key "hdr"}
      (header conn)]
-    (ant/layout {:has-sider true}
+    (ant/layout {:key 1 :has-sider true}
                 (ant/layout-sider
-                 {:style {:overflow "auto"
+                 {:key 1
+                  :style {:overflow "auto"
                           :height "100vh"
                           :position "fixed"
                           :left 0
                           :top 63
                           :bottom 0}}
                  (side-menu conn))
-                (ant/layout {:style {:marginLeft 200}}
+                (ant/layout {:key 2 :style {:marginLeft 200}}
                             (content-area conn)))]))
 
 (defn  ^:dev/after-load start! []

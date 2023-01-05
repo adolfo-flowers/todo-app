@@ -4,22 +4,18 @@
             ["moment" :as moment]
             ["antd" :refer [Form]]
             ["@ant-design/icons"  :refer [PlusOutlined]]
-            [app.renderer.datascript :refer [get-projects
-                                             create-project
-                                             create-todo
-                                             get-modal-state
-                                             set-modal-state]]))
+            [app.renderer.datascript :as d]))
 
-(defn create-new-project [conn set-project-name e]
+(defn create-new-project-on-click [create-project set-project-name e]
   (e.preventDefault)
   (set-project-name
    (set-project-name (fn [project-name]
                        (when (not-empty project-name)
-                         (create-project conn project-name))
+                         (create-project project-name))
                        ""))))
 
 (rum/defc drop-down-select-project
-  [conn menu]
+  [create-project menu]
   (let [[project-name set-project-name] (rum/use-state "")]
     [:<>
      menu
@@ -30,7 +26,7 @@
                   :value project-name
                   :on-change (fn [^js/e.target.value e]
                                (set-project-name (.-target.value e)))})
-      (ant/button {:type "text" :on-click (partial create-new-project conn set-project-name)}
+      (ant/button {:type "text" :on-click (partial create-new-project-on-click create-project set-project-name)}
                   "create project")]]))
 
 (defn due-date-input []
@@ -44,7 +40,7 @@
                        :message "Please enter a due date"}])}
    (ant/date-picker {:show-time {:defaultValue (moment "00:00:00" "HH:mm")}})))
 
-(defn project-input [conn projects]
+(defn project-input [create-project projects]
   (ant/form-item
    {:label "Project"
     :name "project"
@@ -52,7 +48,7 @@
    (ant/select {:style {:max-width "300px"}
                 :show-search false
                 :placeholder "Select a project"
-                :dropdown-render (partial drop-down-select-project conn)
+                :dropdown-render (partial drop-down-select-project create-project)
                 :options (map #(clj->js {:label (:name %) :value (:name %)}) projects)})))
 
 (defn title-input []
@@ -84,10 +80,10 @@
                               :html-type "submit"}
                              text)))
 
-(rum/defcs todo-form < rum/reactive
-  [local-state conn form initial-values]
-  (let [db (rum/react conn)
-        projects (get-projects db)]
+(rum/defc todo-form
+  [projects initial-values create-todo create-project]
+  (let [[form] (Form.useForm)]
+    (rum/use-effect! #(form.setFieldsValue initial-values) [initial-values])
     (ant/form
      {:name "create-todo"
       :form form
@@ -97,20 +93,21 @@
                    (let [form-values  (js->clj fv {:keywordize-keys true})
                          current-todo  (js->clj initial-values {:keywordize-keys true})
                          new-todo  (assoc form-values :id (:id current-todo -1))]
-                     (when (not= current-todo new-todo)
-                       (create-todo conn new-todo)
-                       (form.resetFields))))}
+                     (if (not= current-todo new-todo)
+                       (do (create-todo new-todo)
+                           (form.resetFields))
+                       (form.setFieldsValue initial-values))))}
      (title-input)
      (when initial-values (status-input))
-     (project-input conn projects)
+     (project-input create-project projects)
      (due-date-input)
      (notes-input)
      (submit-button (if (nil? initial-values) "Create" "Update")))))
 
-(rum/defc create-todo-modal
-  [conn open? set-open initial-values]
-  (let [[form] (Form.useForm)]
-    (rum/use-effect! #(form.setFieldsValue initial-values) [initial-values])
+(rum/defcs create-todo-modal < rum/reactive
+  [_ conn open? set-open initial-values]
+  (let [db (rum/react conn)
+        projects (d/get-projects db)]
     (ant/modal {:key (:id initial-values)
                 :footer nil
                 :open open?
@@ -118,15 +115,15 @@
                 :width 600
                 :on-ok #(set-open false)
                 :on-cancel #(set-open false)}
-               (todo-form conn form initial-values))))
+               (todo-form projects initial-values #(d/create-todo conn %)  #(d/create-project conn %)))))
 
 (rum/defcs create-todo-button < rum/reactive
   [_ conn]
   (let [db (rum/react conn)
-        open (get-modal-state db 1)
-        set-open (partial set-modal-state conn 1)]
+        open? (d/get-modal-state db 1)
+        set-open (partial d/set-modal-state conn 1)]
     [:<>
-     (create-todo-modal conn open set-open nil)
+     (create-todo-modal conn open? set-open nil)
      (ant/button {:type "primary"
                   :icon (js/React.createElement PlusOutlined)
                   :on-click #(set-open true)})]))

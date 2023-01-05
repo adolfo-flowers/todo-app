@@ -37,7 +37,8 @@
         initial-values (clj->js (update (first (get-modal-todo db)) :due-date #(moment %)))
         open (get-modal-state db 3)
         set-open (partial set-modal-state conn 3)]
-    [(create-todo-modal conn open set-open initial-values)
+    [:<>
+     (create-todo-modal conn open set-open initial-values)
      (ant/table {:key 5
                  :row-class-name (constantly "table-row")
                  :columns (clj->js (columns pfilters))
