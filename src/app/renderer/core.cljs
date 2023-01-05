@@ -19,7 +19,8 @@
   [conn]
   (ant/layout
    {:style {:min-height "100%"}}
-   [:div.sticky (header conn)]
+   [:div.sticky {:id "hdr"}
+    (header conn)]
    (ant/layout {:has-sider true}
                (ant/layout-sider
                 {:style {:overflow "auto"

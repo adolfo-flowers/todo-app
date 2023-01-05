@@ -25,11 +25,12 @@
                       :todo/status "todo"
                       :todo/project [:project/name (:project todo)]}]))
 
-(def query-todos-by-project '{:find [?id ?title ?notes ?due-date ?status]
+(def query-todos-by-project '{:find [?id ?title ?notes ?due-date ?status ?project-name]
                               :in [$ ?status ?project-id]
-                              :keys [id title notes due-date status]
+                              :keys [id title notes due-date status project]
                               :where
                               [[?id :todo/project ?project-id]
+                               [?project-id :project/name ?project-name]
                                [?id :todo/title ?title]
                                [?id :todo/status ?status]
                                [?id :todo/due-date ?due-date]

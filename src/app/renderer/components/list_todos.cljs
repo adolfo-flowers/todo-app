@@ -36,13 +36,13 @@
 (defn todo-block [conn todo]
   (ant/collapse-panel
    {:key (:id todo)
-    :show-arrow false
+    :show-arrow true
     :header (todo-block-header todo)}
    (ant/card
-    {:key (:id todo) :title (:project todo) :style {:width "300px" :overflow "hidden"}}
-    (format-date (:due-date todo))
+    {:key (:id todo) :title (str "Project: " (:project todo)) :style {:width "300px" :overflow "hidden"}}
+    (str "Due: " (format-date (:due-date todo)))
     (ant/divider {:style {:margin "20px 0 15px 0"}})
-    (:title todo)
+    (str "Title: " (:title todo))
     (ant/divider {:style {:margin "20px 0 15px 0"}})
     (:notes todo)
     (ant/divider {:style {:margin "20px 0 15px 0"}})
